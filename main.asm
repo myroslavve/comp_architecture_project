@@ -228,4 +228,46 @@ CountOccurences proc
                     ret                                  ; Return to caller
 CountOccurences endp
 
+    ;---------------------------------------------------------------
+    ; PrintDecimal    Print a decimal number
+    ;---------------------------------------------------------------
+    ; Input:
+    ;       ax = number to print
+    ; Output:
+    ;       none
+    ; Registers:
+    ;       ax, bx, cx, dx
+    ;---------------------------------------------------------------
+PrintDecimal proc
+                    push  ax                             ; Save modified registers
+                    push  bx
+                    push  cx
+                    push  dx
+
+                    mov   bx, 10                         ; Set bx to 10 for division
+                    xor   cx, cx                         ; Initialize cx to 0 (digit count)
+                    xor   dx, dx                         ; Clear dx (remainder)
+
+@@c0:
+                    div   bx                             ; Divide ax by bx, quotient in ax, remainder in dx
+                    push  dx                             ; Push remainder onto stack
+                    xor   dx, dx                         ; Clear dx
+                    inc   cx                             ; Increment digit count
+                    test  ax, ax                         ; Check if ax is zero
+                    jnz   @@c0                           ; If not zero, continue division
+
+@@d0:
+                    pop   dx                             ; Pop remainder from stack
+                    add   dl, 30h                        ; Convert remainder to ASCII character
+                    mov   ah, 02h                        ; Set ah to 02h for printing character
+                    int   21h                            ; Print character
+                    loop  @@d0                           ; Loop until all digits are printed
+
+                    pop   dx                             ; Restore registers
+                    pop   cx
+                    pop   bx
+                    pop   ax
+                    ret                                  ; Return to caller
+PrintDecimal endp
+
 end main
