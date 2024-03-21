@@ -43,12 +43,9 @@ main proc
                mov   dl, ds:[si]
                int   21h
     ; push char to subStr
+               mov   al, ds:[si]
                mov   di, offset subStr
-               call  StrLength
-               add   di, cx
-               mov   [di], dl
-               inc   di
-               mov   [di], 0
+               call  StrPush
                dec   cl
                jmp   write_char
     write_end: 
@@ -162,5 +159,33 @@ StrPos proc
                pop   ax
                ret                                  ; Return to caller
 StrPos endp
+
+    ;---------------------------------------------------------------
+    ; StrPush       Push a character onto the end of a string
+    ;---------------------------------------------------------------
+    ; Input:
+    ;       al = character to push
+    ;       di = address of string
+    ; Output:
+    ;       none
+    ; Registers:
+    ;       di
+    ;---------------------------------------------------------------
+StrPush proc
+               push  ax                             ; Save modified registers
+               push  cx
+               push  di
+
+               call  StrLength                      ; Find length of string
+               mov   bx, cx                         ; Save length of string in bx
+               mov   [di + bx], al                  ; Push character onto end of string
+               inc   bx                             ; Increment length of string
+               mov   byte ptr [di + bx], ASCNull    ; Null-terminate string
+               
+               pop   di                             ; Restore registers
+               pop   cx
+               pop   ax
+               ret                                  ; Return to caller
+StrPush endp
 
 end main
