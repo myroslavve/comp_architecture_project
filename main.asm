@@ -3,7 +3,9 @@
 
 .data
     oneChar db  0
-    ASCNull EQU 0    ; ASCII null character
+    ASCNull EQU 0        ; ASCII null character
+    ; substring to find, given in args
+    subStr  db  "", 0
 
 .code
 main proc
@@ -27,9 +29,33 @@ main proc
 
     end_read:  
     ; end of file reached, do something here if needed
+    
+    ; ds = PSP
+    ; copy param
+               xor   ch,ch
+               mov   cl, ds:[80h]                   ; at offset 80h length of "args"
+    write_char:
+               test  cl, cl
+               jz    write_end
+               mov   si, 81h                        ; at offest 81h first char of "args"
+               add   si, cx
+               mov   ah, 02h
+               mov   dl, ds:[si]
+               int   21h
+    ; push char to subStr
+               mov   di, offset subStr
+               call  StrLength
+               add   di, cx
+               mov   [di], dl
+               inc   di
+               mov   [di], 0
+               dec   cl
+               jmp   write_char
+    write_end: 
 
-
-               int   21h                            ; Call the DOS interrupt to terminate the program
+    ; end program
+               mov   ah, 4Ch                        ; DOS function 4Ch: terminate program
+               int   21h                            ; Call the DOS interrupt
 main endp
 
     ;---------------------------------------------------------------
