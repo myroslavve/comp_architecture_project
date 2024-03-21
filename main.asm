@@ -2,12 +2,10 @@
 .stack 100h
 
 .data
-    oneChar db  0
-    ASCNull EQU 0        ; ASCII null character
-    ; substring to find, given in args
-    subStr  db  "", 0
-    ; string to search
-    str     db  "", 0
+    oneChar   db  0
+    ASCNull   EQU 0        ; ASCII null character
+    subString db  "", 0    ; substring to find, given in args
+    string    db  "", 0    ; string to search
 
 .code
 main proc
@@ -28,7 +26,7 @@ main proc
                int   21h                            ; Call the DOS interrupt
     ; push char to str
                mov   al, oneChar
-               mov   di, offset str
+               mov   di, offset string
                call  StrPush
 
                jmp   read_next                      ; jump back to read_next to read the next character
@@ -49,9 +47,9 @@ main proc
                mov   ah, 02h
                mov   dl, ds:[si]
                int   21h
-    ; push char to subStr
+    ; push char to subString
                mov   al, ds:[si]
-               mov   di, offset subStr
+               mov   di, offset subString
                call  StrPush
 
                dec   cl
@@ -189,7 +187,7 @@ StrPush proc
                mov   [di + bx], al                  ; Push character onto end of string
                inc   bx                             ; Increment length of string
                mov   byte ptr [di + bx], ASCNull    ; Null-terminate string
-               
+
                pop   di                             ; Restore registers
                pop   cx
                pop   ax
