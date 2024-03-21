@@ -6,6 +6,8 @@
     ASCNull EQU 0        ; ASCII null character
     ; substring to find, given in args
     subStr  db  "", 0
+    ; string to search
+    str     db  "", 0
 
 .code
 main proc
@@ -24,7 +26,11 @@ main proc
                mov   ah, 02h                        ; DOS function 2: display character
                mov   dl, oneChar                    ; character to print
                int   21h                            ; Call the DOS interrupt
-            
+    ; push char to str
+               mov   al, oneChar
+               mov   di, offset str
+               call  StrPush
+
                jmp   read_next                      ; jump back to read_next to read the next character
 
     end_read:  
@@ -39,6 +45,7 @@ main proc
                jz    write_end
                mov   si, 81h                        ; at offest 81h first char of "args"
                add   si, cx
+    ; print the character
                mov   ah, 02h
                mov   dl, ds:[si]
                int   21h
@@ -46,6 +53,7 @@ main proc
                mov   al, ds:[si]
                mov   di, offset subStr
                call  StrPush
+
                dec   cl
                jmp   write_char
     write_end: 
