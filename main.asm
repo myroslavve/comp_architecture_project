@@ -194,4 +194,38 @@ StrPush proc
                ret                                  ; Return to caller
 StrPush endp
 
+    ;---------------------------------------------------------------
+    ; CountOccurences    Count occurrences of a substring in a string
+    ;---------------------------------------------------------------
+    ; Input:
+    ;       si = address of substring to find
+    ;       di = address of target string to scan
+    ; Output:
+    ;       cx = number of occurrences of substring in string
+    ; Registers:
+    ;       cx
+    ;---------------------------------------------------------------
+CountOccurences proc
+                    push  ax                             ; Save modified registers
+                    push  bx
+                    push  di
+                    push  si
+
+                    mov   cx, 0                          ; Initialize count to 0
+                    call  StrPos                         ; Find first occurrence of substring
+                    jz    @@a0                           ; Jump if substring found
+                    jmp   @@b0                           ; Else exit
+@@a0:
+                    inc   cx                             ; Increment count
+                    add   di, dx                         ; Advance di to next position
+                    call  StrPos                         ; Find next occurrence of substring
+                    jz    @@a0                           ; Jump if substring found
+@@b0:
+                    pop   si                             ; Restore registers
+                    pop   di
+                    pop   bx
+                    pop   ax
+                    ret                                  ; Return to caller
+CountOccurences endp
+
 end main
