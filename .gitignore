@@ -1,0 +1,10 @@
+# Files used for testing
+cmp.exe
+cmp.map
+cmp.obj
+cmp.res
+v1.exe
+v1.map
+v1.obj
+v1.res
+test.res
