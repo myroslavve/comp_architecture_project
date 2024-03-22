@@ -9,31 +9,10 @@
 
 .code
 main proc
-    ; ds = PSP
-    ; copy param
-                    xor   ch,ch
-                    mov   cl, ds:[80h]                   ; at offset 80h length of "args"
-    write_char:     
-                    test  cl, cl
-                    jz    write_end
-                    mov   si, 81h                        ; at offest 81h first char of "args"
-                    add   si, cx
-    ; print the character
-                    mov   ah, 02h
-                    mov   dl, ds:[si]
-                    int   21h
-    ; push char to subString
-                    mov   al, ds:[si]
-                    mov   di, offset subString
-                    call  StrPush
-
-                    dec   cl
-                    jmp   write_char
-    write_end:      
-
+    ; read argument
+                    call  ReadArgument
     ; read file
                     call  ReadFile
-
     ; end program
                     mov   ah, 4Ch                        ; DOS function 4Ch: terminate program
                     int   21h                            ; Call the DOS interrupt
@@ -104,6 +83,41 @@ ReadFile proc
 
                     ret                                  ; Return to caller
 ReadFile endp
+
+    ;---------------------------------------------------------------
+    ; ReadArgument  Read the argument from the command line
+    ;---------------------------------------------------------------
+    ; Input:
+    ;       none
+    ; Output:
+    ;       none
+    ; Registers:
+    ;       ax, bx, cx, dx
+    ;---------------------------------------------------------------
+ReadArgument proc
+    ; ds = PSP
+    ; copy param
+                    xor   ch,ch
+                    mov   cl, ds:[80h]                   ; at offset 80h length of "args"
+    write_char:     
+                    test  cl, cl
+                    jz    write_end
+                    mov   si, 81h                        ; at offest 81h first char of "args"
+                    add   si, cx
+    ; print the character
+                    mov   ah, 02h
+                    mov   dl, ds:[si]
+                    int   21h
+    ; push char to subString
+                    mov   al, ds:[si]
+                    mov   di, offset subString
+                    call  StrPush
+
+                    dec   cl
+                    jmp   write_char
+    write_end:      
+                    ret                                  ; Return to caller
+ReadArgument endp
 
     ;---------------------------------------------------------------
     ; StrLength     Count non-null characters in a string
