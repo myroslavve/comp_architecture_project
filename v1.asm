@@ -3,9 +3,9 @@
 
 .data
     oneChar   db  0
-    ASCNull   EQU 0        ; ASCII null character
-    subString db  "", 0    ; substring to find, given in args
-    string    db  "", 0    ; string to search
+    ASCNull   EQU 0                ; ASCII null character
+    subString db  255 dup(0), 0    ; substring to find, given in args
+    string    db  255 dup(0), 0    ; string to search
 
 .code
 main proc
