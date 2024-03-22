@@ -9,31 +9,6 @@
 
 .code
 main proc
-    read_next:      
-                    mov   ah, 3Fh
-                    mov   bx, 0h                         ; stdin handle
-                    mov   cx, 1                          ; 1 byte to read
-                    mov   dx, offset oneChar             ; read to ds:dx
-                    int   21h                            ; cx = number of bytes read
-
-    ; check if end of file (EOF) reached
-                    cmp   ax, 0                          ; check if EOF reached
-                    je    end_read                       ; jump to end_read if EOF reached
-
-    ; print the character
-                    mov   ah, 02h                        ; DOS function 2: display character
-                    mov   dl, oneChar                    ; character to print
-                    int   21h                            ; Call the DOS interrupt
-    ; push char to str
-                    mov   al, oneChar
-                    mov   di, offset string
-                    call  StrPush
-
-                    jmp   read_next                      ; jump back to read_next to read the next character
-
-    end_read:       
-    ; end of file reached, do something here if needed
-    
     ; ds = PSP
     ; copy param
                     xor   ch,ch
@@ -56,10 +31,79 @@ main proc
                     jmp   write_char
     write_end:      
 
+    ; read file
+                    call  ReadFile
+
     ; end program
                     mov   ah, 4Ch                        ; DOS function 4Ch: terminate program
                     int   21h                            ; Call the DOS interrupt
 main endp
+
+    ;---------------------------------------------------------------
+    ; ReadFile      Read a file and count occurrences of a substring
+    ;---------------------------------------------------------------
+    ; Input:
+    ;       none
+    ; Output:
+    ;       none
+    ; Registers:
+    ;       ax, bx, cx, dx
+    ;---------------------------------------------------------------
+ReadFile proc
+    ; read file line by line and call CountOccurences after each line
+    read_next:      
+                    mov   ah, 3Fh
+                    mov   bx, 0h                         ; stdin handle
+                    mov   cx, 1                          ; 1 byte to read
+                    mov   dx, offset oneChar             ; read to ds:dx
+                    int   21h                            ; cx = number of bytes read
+
+    ; check if end of line reached (CR or LF)
+                    cmp   oneChar, 0Dh                   ; check if CR reached
+                    je    end_line                       ; jump to end_line if CR reached
+                    cmp   oneChar, 0Ah                   ; check if LF reached
+                    je    end_line                       ; jump to end_line if LF reached
+
+    ; check if end of file (EOF) reached
+                    cmp   ax, 0                          ; check if EOF reached
+                    je    end_read                       ; jump to end_read if EOF reached
+    
+    continue_read:  
+    ; print the character
+                    mov   ah, 02h                        ; DOS function 2: display character
+                    mov   dl, oneChar                    ; character to print
+                    int   21h                            ; Call the DOS interrupt
+    ; push char to str
+                    mov   al, oneChar
+                    mov   di, offset string
+                    call  StrPush
+
+                    jmp   read_next                      ; jump back to read_next to read the next character
+
+    end_line:       
+                    mov   si, offset subString
+                    mov   di, offset string
+                    call  CountOccurences
+
+    ; Check if next symbol is LF
+                    mov   ah, 3Fh
+                    mov   bx, 0h                         ; stdin handle
+                    mov   cx, 1                          ; 1 byte to read
+                    mov   dx, offset oneChar             ; read to ds:dx
+                    int   21h                            ; cx = number of bytes read
+
+                    cmp   oneChar, 0Ah                   ; check if LF reached
+                    je    read_next                      ; jump to read_next if LF
+
+                    jmp   continue_read                  ; jump to continue_read if not LF
+
+    end_read:       
+                    mov   si, offset subString
+                    mov   di, offset string
+                    call  CountOccurences
+
+                    ret                                  ; Return to caller
+ReadFile endp
 
     ;---------------------------------------------------------------
     ; StrLength     Count non-null characters in a string
