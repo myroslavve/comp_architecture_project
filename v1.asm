@@ -9,6 +9,8 @@
 
 .code
 main proc
+                    mov   ax, @data
+                    mov   ds, ax
     ; read argument
                     call  ReadArgument
     ; read file
