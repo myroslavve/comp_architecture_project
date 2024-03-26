@@ -2,10 +2,13 @@
 .stack 100h
 
 .data
-    oneChar   db  0
-    ASCNull   EQU 0                ; ASCII null character
-    subString db  255 dup(0), 0    ; substring to find, given in args
-    string    db  255 dup(0), 0    ; string to search
+    oneChar       db  0
+    ASCNull       EQU 0                ; ASCII null character
+    subString     db  255 dup(0), 0    ; substring to find, given in args
+    string        db  255 dup(0), 0    ; string to search
+    count         db  100 dup(0)       ; array to store count of substring by line
+    line_indices  db  100 dup(0)       ; array to store line indices of count array
+    current_index db  0                ; index of line in count array
 
 .code
 main proc
@@ -65,6 +68,7 @@ ReadFile proc
                     mov   si, offset subString
                     mov   di, offset string
                     call  CountOccurences
+                    inc   current_index                  ; increment current_index
 
     ; Check if next symbol is LF
                     mov   ah, 3Fh
@@ -281,6 +285,9 @@ CountOccurences proc
                     call  StrPos                         ; Find next occurrence of substring
                     jz    @@a0                           ; Jump if substring found
 @@b0:
+                    mov   di, offset count
+                    mov   [di + current_index], cl       ; Store count in count array
+
                     pop   si                             ; Restore registers
                     pop   di
                     pop   bx
