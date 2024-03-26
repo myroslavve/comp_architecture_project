@@ -14,6 +14,8 @@
 main proc
                     mov   ax, @data
                     mov   ds, ax
+    ; fill line_indices array
+                    call  FillIndices
     ; read argument
                     call  ReadArgument
     ; read file
@@ -336,5 +338,37 @@ PrintDecimal proc
                     pop   ax
                     ret                                  ; Return to caller
 PrintDecimal endp
+
+    ;---------------------------------------------------------------
+    ; FillIndices    Fill the line_indices array with numbers from 0 - 99
+    ;---------------------------------------------------------------
+    ; Input:
+    ;       none
+    ; Output:
+    ;       none
+    ; Registers:
+    ;       ax, bx, cx, dx
+    ;---------------------------------------------------------------
+
+FillIndices proc
+                    push  ax                             ; Save modified registers
+                    push  cx
+                    push  di
+
+                    mov   ax, 0                          ; Initialize ax to 0
+                    mov   di, offset line_indices        ; Set di to the address of line_indices
+                    mov   cx, 100                        ; Set cx to 100
+
+    fill_loop:      
+                    mov   [di], ax                       ; Store the value of ax in the current index of line_indices
+                    inc   ax                             ; Increment ax
+                    inc   di                             ; Increment di
+                    loop  fill_loop                      ; Loop until cx becomes zero
+
+                    pop   di                             ; Restore registers
+                    pop   cx
+                    pop   ax
+                    ret
+FillIndices endp
 
 end main
