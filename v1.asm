@@ -15,12 +15,14 @@ main proc
     ; set up data segment
                     mov   ax, @data
                     mov   ds, ax
-    ; fill line_indices array
-                    call  FillIndices
     ; read argument
                     call  ReadArgument
     ; read file
                     call  ReadFile
+    ; fill line_indices array
+                    call  FillIndices
+    ; print result
+                    call  PrintResult
     ; end program
                     mov   ah, 4Ch                        ; DOS function 4Ch: terminate program
                     int   21h                            ; Call the DOS interrupt
@@ -371,5 +373,60 @@ FillIndices proc
                     pop   ax
                     ret
 FillIndices endp
+
+    ;---------------------------------------------------------------
+    ; PrintResult    Print n lines with the count of the substring and the line index
+    ;---------------------------------------------------------------
+    ; Input:
+    ;       none
+    ; Output:
+    ;       none
+    ; Registers:
+    ;       ax, cx, dx
+    ;---------------------------------------------------------------
+PrintResult proc
+                    push  ax                             ; Save modified registers
+                    push  cx
+                    push  dx
+                    push  di
+                    push  si
+
+                    mov   cl, current_index              ; Print current_index + 1 lines
+                    inc   cx
+                    mov   di, offset count               ; Set di to the address of count
+                    mov   si, offset line_indices        ; Set si to the address of line_indices
+                    
+    print_loop:     
+    ; Print count of substring
+                    mov   al, [di]
+                    call  PrintDecimal
+    ; Print space
+                    mov   dl, 20h
+                    mov   ah, 02h
+                    int   21h
+                    xor   ax, ax                         ; Clear ax
+    ; Print line index
+                    mov   al, [si]
+                    call  PrintDecimal
+    ; Print newline
+                    mov   dl, 0Dh                        ; carriage return
+                    mov   ah, 02h
+                    int   21h
+                    mov   dl, 0Ah                        ; line feed
+                    mov   ah, 02h
+                    int   21h
+                    xor   ax, ax                         ; Clear ax
+
+                    inc   di                             ; Increment di
+                    inc   si                             ; Increment si
+                    loop  print_loop                     ; Loop until cx becomes zero
+
+                    pop   si                             ; Restore registers
+                    pop   di
+                    pop   dx
+                    pop   cx
+                    pop   ax
+                    ret
+PrintResult endp
 
 end main
