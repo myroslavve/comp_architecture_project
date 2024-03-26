@@ -125,8 +125,12 @@ ReadArgument proc
                     int   21h
     ; push char to subString
                     mov   al, es:[si]
+                    push  es
+                    mov   bx, @data
+                    mov   es, bx                         ; set es to data segment, for scasb to work
                     mov   di, offset subString
                     call  StrPush
+                    pop   es
 
                     dec   cl
                     jmp   write_char
@@ -258,6 +262,7 @@ StrPos endp
 StrPush proc
                     push  ax                             ; Save modified registers
                     push  cx
+                    push  bx
                     push  di
 
                     call  StrLength                      ; Find length of string
@@ -267,6 +272,7 @@ StrPush proc
                     mov   byte ptr [di + bx], ASCNull    ; Null-terminate string
 
                     pop   di                             ; Restore registers
+                    pop   bx
                     pop   cx
                     pop   ax
                     ret                                  ; Return to caller
