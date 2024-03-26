@@ -12,6 +12,7 @@
 
 .code
 main proc
+    ; set up data segment
                     mov   ax, @data
                     mov   ds, ax
     ; fill line_indices array
@@ -103,10 +104,10 @@ ReadFile endp
     ;       ax, bx, cx, dx
     ;---------------------------------------------------------------
 ReadArgument proc
-    ; ds = PSP
+    ; es = PSP
     ; copy param
                     xor   ch,ch
-                    mov   cl, ds:[80h]                   ; at offset 80h length of "args"
+                    mov   cl, es:[80h]                   ; at offset 80h length of "args"
     write_char:     
                     test  cl, cl
                     jz    write_end
@@ -114,10 +115,10 @@ ReadArgument proc
                     add   si, cx
     ; print the character
                     mov   ah, 02h
-                    mov   dl, ds:[si]
+                    mov   dl, es:[si]
                     int   21h
     ; push char to subString
-                    mov   al, ds:[si]
+                    mov   al, es:[si]
                     mov   di, offset subString
                     call  StrPush
 
