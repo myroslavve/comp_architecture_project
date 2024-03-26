@@ -17,6 +17,9 @@ main proc
                     mov   ds, ax
     ; read argument
                     call  ReadArgument
+    ; move data segment to es
+                    mov   ax, @data
+                    mov   es, ax
     ; read file
                     call  ReadFile
     ; fill line_indices array
