@@ -290,6 +290,12 @@ CountOccurences proc
                     push  si
 
                     mov   cx, 0                          ; Initialize count to 0
+
+    ; if substring is empty, return 0
+                    mov   al, subStringLen
+                    cmp   al, 0
+                    jz    @@b0
+
                     call  StrPos                         ; Find first occurrence of substring
                     jz    @@a0                           ; Jump if substring found
                     jmp   @@b0                           ; Else exit
