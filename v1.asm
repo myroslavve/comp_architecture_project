@@ -9,6 +9,7 @@
     count         db  100 dup(0)       ; array to store count of substring by line
     line_indices  db  100 dup(0)       ; array to store line indices of count array
     current_index db  0                ; index of line in count array
+    subStringLen  db  0                ; length of substring
 
 .code
 main proc
@@ -130,6 +131,11 @@ ReadArgument proc
                     dec   cl
                     jmp   write_char
     write_end:      
+    ; count length of substring
+                    mov   di, offset subString
+                    call  StrLength
+                    mov   subStringLen, cl
+                    
                     ret                                  ; Return to caller
 ReadArgument endp
 
@@ -289,7 +295,9 @@ CountOccurences proc
                     jmp   @@b0                           ; Else exit
 @@a0:
                     inc   cx                             ; Increment count
-                    add   di, dx                         ; Advance di to next position
+                    mov   ax, dx                         ; Save index of substring in ax
+                    add   al, subStringLen               ; Move to next character after substring
+                    add   di, ax                         ; move di to the next character after the substring
                     call  StrPos                         ; Find next occurrence of substring
                     jz    @@a0                           ; Jump if substring found
 @@b0:
