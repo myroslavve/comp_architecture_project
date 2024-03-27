@@ -114,6 +114,9 @@ ReadArgument proc
     ; copy param
                     xor   ch,ch
                     mov   cl, es:[80h]                   ; at offset 80h length of "args"
+    ; length of substring is length of args - 1
+                    mov   subStringLen, cl
+                    dec   subStringLen
     write_char:     
                     test  cl, cl
                     jz    write_end
@@ -138,11 +141,6 @@ ReadArgument proc
                     dec   cl
                     jmp   write_char
     write_end:      
-    ; count length of substring
-                    mov   di, offset subString
-                    call  StrLength
-                    mov   subStringLen, cl
-                    
                     ret                                  ; Return to caller
 
     dec_cx_and_jump:
