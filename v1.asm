@@ -25,6 +25,8 @@ main proc
                     call  ReadFile
     ; fill line_indices array
                     call  FillIndices
+    ; sort count and line_indices arrays
+                    call  BubbleSort
     ; print result
                     call  PrintResult
     ; end program
@@ -540,6 +542,61 @@ PrintResult proc
 PrintResult endp
 
     ;---------------------------------------------------------------
+    ; BubbleSort    Sort the count and line_indices arrays
+    ;---------------------------------------------------------------
+    ; Input:
+    ;       none
+    ; Output:
+    ;       none
+    ; Registers:
+    ;       ax, bx, cx, dx, di, si
+    ;---------------------------------------------------------------
+BubbleSort proc
+                    push  ax                             ; Save modified registers
+                    push  bx
+                    push  cx
+                    push  dx
+                    push  di
+                    push  si
+
+                    xor   cx, cx                         ; Clear cx
+                    mov   cl, last_line                  ; Set cx to last_line
+
+    outer_loop:     
+                    mov   di, offset count               ; Set di to the address of count
+                    mov   si, offset line_indices        ; Set si to the address of line_indices
+                    push  cx                             ; Save cx
+    inner_loop:     
+                    mov   al, [di]                       ; Set al to the value at di
+                    mov   ah, [di + 1]                   ; Set ah to the value at di + 1
+                    cmp   al, ah                         ; Compare al and ah
+                    jbe   continue                       ; Jump if al <= ah
+    ; Swap the values
+                    mov   [di], ah                       ; Set the value at di to al
+                    mov   [di + 1], al                   ; Set the value at di + 1 to ah
+
+                    mov   al, [si]                       ; Set al to the value at si
+                    mov   ah, [si + 1]                   ; Set ah to the value at si + 1
+                    mov   [si], ah                       ; Set the value at si to al
+                    mov   [si + 1], al                   ; Set the value at si + 1 to ah
+    continue:       
+                    inc   di                             ; Increment di
+                    inc   si
+                    loop  inner_loop                     ; Loop until cx becomes zero
+
+                    pop   cx                             ; Restore cx
+                    loop  outer_loop                     ; Loop until cx becomes zero
+
+                    pop   si                             ; Restore registers
+                    pop   di
+                    pop   dx
+                    pop   cx
+                    pop   bx
+                    pop   ax
+                    ret
+BubbleSort endp
+
+    ;---------------------------------------------------------------
     ; Separators    Private routine to check for blanks, tabs, and crs
     ;---------------------------------------------------------------
     ; Input:
@@ -560,5 +617,7 @@ Separators proc
     found_separator:
                     ret                                  ; Return to caller
 Separators endp
+
+
 
 end main
