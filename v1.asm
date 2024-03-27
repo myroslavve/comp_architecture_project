@@ -393,7 +393,7 @@ FillIndices proc
 
                     mov   ax, 0                          ; Initialize ax to 0
                     mov   di, offset line_indices        ; Set di to the address of line_indices
-                    mov   cx, 100                        ; Set cx to 100
+                    mov   cx, 99                         ; Set cx to 99
 
     fill_loop:      
                     mov   [di], ax                       ; Store the value of ax in the current index of line_indices
