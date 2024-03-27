@@ -77,6 +77,12 @@ ReadFile proc
                     mov   si, offset subString
                     mov   di, offset string
                     call  CountOccurences
+
+    ; clear string
+                    mov   dx, 0                          ; index to start deleting
+                    mov   cx, 255                        ; number of characters to delete
+                    call  StrDelete                      ; delete all characters in string
+
                     inc   current_index                  ; increment current_index
 
     ; Check if next symbol is LF
