@@ -114,17 +114,16 @@ ReadArgument proc
     ; copy param
                     xor   ch,ch
                     mov   cl, es:[80h]                   ; at offset 80h length of "args"
-    ; length of substring is length of args - 1
-                    mov   subStringLen, cl
-                    dec   subStringLen
-    write_char:     
                     test  cl, cl
                     jz    write_end
                     mov   si, 81h                        ; at offest 81h first char of "args"
-                    add   si, cx
-    ; skip cr
-                    cmp   byte ptr es:[si], 0Dh
-                    je    dec_cx_and_jump
+
+    skip_separators:
+                    call  Separators                     ; Skip leading blanks & tabs
+                    jne   write_char                     ; Jump if not a blank or tab
+                    inc   si                             ; Skip this character
+                    loop  skip_separators                ; Loop until done or cx=0
+    write_char:     
     ; print the character
                     mov   ah, 02h
                     mov   dl, es:[si]
@@ -138,9 +137,14 @@ ReadArgument proc
                     call  StrPush
                     pop   es
 
-                    dec   cl
-                    jmp   write_char
+                    inc   si
+                    loop  write_char
     write_end:      
+    ; calculate length of substring
+                    mov   si, offset subString
+                    call  StrLength
+                    mov   subStringLen, cl
+                          
                     ret                                  ; Return to caller
 
     dec_cx_and_jump:
@@ -474,11 +478,11 @@ PrintResult endp
 Separators proc
                     mov   al, es:[si]                    ; Get character at es:si
                     cmp   al, 020h                       ; Is char a blank?
-                    je    @@10                           ; Jump if yes
+                    je    found_separator                ; Jump if yes
                     cmp   al, 009h                       ; Is char a tab?
-                    je    @@10                           ; Jump if yes
+                    je    found_separator                ; Jump if yes
                     cmp   al, 00Dh                       ; Is char a cr?
-@@10:
+    found_separator:
                     ret                                  ; Return to caller
 Separators endp
 
