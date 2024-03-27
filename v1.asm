@@ -62,10 +62,6 @@ ReadFile proc
                     je    end_read                       ; jump to end_read if EOF reached
     
     continue_read:  
-    ; print the character
-                    mov   ah, 02h                        ; DOS function 2: display character
-                    mov   dl, oneChar                    ; character to print
-                    int   21h                            ; Call the DOS interrupt
     ; push char to str
                     mov   al, oneChar
                     mov   di, offset string
@@ -130,10 +126,6 @@ ReadArgument proc
                     inc   si                             ; Skip this character
                     loop  skip_separators                ; Loop until done or cx=0
     write_char:     
-    ; print the character
-                    mov   ah, 02h
-                    mov   dl, es:[si]
-                    int   21h
     ; push char to subString
                     mov   al, es:[si]
                     push  es
