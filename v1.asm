@@ -321,7 +321,10 @@ CountOccurences proc
                     jz    @@a0                           ; Jump if substring found
 @@b0:
                     mov   di, offset count
-                    mov   [di + current_index], cl       ; Store count in count array
+                    mov   al, current_index
+                    xor   ah, ah
+                    add   di, ax                         ; Set di to the address of count[current_index]
+                    mov   [di], cl                       ; Store count in count array
 
                     pop   si                             ; Restore registers
                     pop   di
