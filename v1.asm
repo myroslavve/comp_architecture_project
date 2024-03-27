@@ -119,6 +119,9 @@ ReadArgument proc
                     jz    write_end
                     mov   si, 81h                        ; at offest 81h first char of "args"
                     add   si, cx
+    ; skip cr
+                    cmp   byte ptr es:[si], 0Dh
+                    je    dec_cx_and_jump
     ; print the character
                     mov   ah, 02h
                     mov   dl, es:[si]
@@ -141,6 +144,10 @@ ReadArgument proc
                     mov   subStringLen, cl
                     
                     ret                                  ; Return to caller
+
+    dec_cx_and_jump:
+                    dec   cl
+                    jmp   write_char
 ReadArgument endp
 
     ;---------------------------------------------------------------
