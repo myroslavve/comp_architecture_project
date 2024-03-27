@@ -2,14 +2,14 @@
 .stack 100h
 
 .data
-    oneChar       db  0
-    ASCNull       EQU 0                ; ASCII null character
-    subString     db  255 dup(0), 0    ; substring to find, given in args
-    string        db  255 dup(0), 0    ; string to search
-    count         db  100 dup(0)       ; array to store count of substring by line
-    line_indices  db  100 dup(0)       ; array to store line indices of count array
-    current_index db  0                ; index of line in count array
-    subStringLen  db  0                ; length of substring
+    oneChar      db  0
+    ASCNull      EQU 0                ; ASCII null character
+    subString    db  255 dup(0), 0    ; substring to find, given in args
+    string       db  255 dup(0), 0    ; string to search
+    count        db  100 dup(0)       ; array to store count of substring by line
+    line_indices db  100 dup(0)       ; array to store line indices of count array
+    last_line    db  0                ; index of line in count array
+    subStringLen db  0                ; length of substring
 
 .code
 main proc
@@ -79,7 +79,7 @@ ReadFile proc
                     mov   cx, 255                        ; number of characters to delete
                     call  StrDelete                      ; delete all characters in string
 
-                    inc   current_index                  ; increment current_index
+                    inc   last_line                      ; increment last_line
 
     ; Check if next symbol is LF
                     mov   ah, 3Fh
@@ -398,9 +398,9 @@ CountOccurences proc
                     jz    @@a0                           ; Jump if substring found
 @@b0:
                     mov   di, offset count
-                    mov   al, current_index
+                    mov   al, last_line
                     xor   ah, ah
-                    add   di, ax                         ; Set di to the address of count[current_index]
+                    add   di, ax                         ; Set di to the address of count[last_line]
                     mov   [di], cl                       ; Store count in count array
 
                     pop   si                             ; Restore registers
@@ -501,7 +501,7 @@ PrintResult proc
                     push  di
                     push  si
 
-                    mov   cl, current_index              ; Print current_index + 1 lines
+                    mov   cl, last_line                  ; Print last_line + 1 lines
                     inc   cx
                     mov   di, offset count               ; Set di to the address of count
                     mov   si, offset line_indices        ; Set si to the address of line_indices
