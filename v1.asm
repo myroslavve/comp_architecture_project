@@ -258,6 +258,83 @@ StrPos proc
 StrPos endp
 
     ;---------------------------------------------------------------
+    ; MoveLeft      Move byte-block left (down) in memory
+    ;---------------------------------------------------------------
+    ; Input:
+    ;       si = address of source string (s1)
+    ;       di = address of destination string (s2)
+    ;       bx = index s1 (i1)
+    ;       dx = index s2 (i2)
+    ;       cx = number of bytes to move (count)
+    ; Output:
+    ;       count bytes from s1[i1] moved to the location
+    ;       starting at s2[i2]
+    ; Registers:
+    ;       none
+    ;---------------------------------------------------------------
+MoveLeft proc
+                    jcxz  @@98                           ; Exit if count = 0
+                    push  cx                             ; Save modified registers
+                    push  si
+                    push  di
+
+                    add   si, bx                         ; Index into source string
+                    add   di, dx                         ; Index into destination string
+                    cld                                  ; Auto-increment si and di
+                    rep   movsb                          ; Move while cx <> 0
+
+                    pop   di                             ; Restore registers
+                    pop   si
+                    pop   cx
+@@98:
+                    ret                                  ; Return to caller
+MoveLeft endp
+
+    ;---------------------------------------------------------------
+    ; StrDelete     Delete characters anywhere in a string
+    ;---------------------------------------------------------------
+    ; Input:
+    ;       di = address of string (s)
+    ;       dx = index (i) of first char to delete
+    ;       cx = number of chars to delete (n)
+    ; Output:
+    ;       n characters deleted from string at s[i]
+    ;       Note: prevents deleting past end of string
+    ; Registers:
+    ;       none
+    ;---------------------------------------------------------------
+StrDelete proc
+                    push  bx                             ; Save modified registers
+                    push  cx
+                    push  di
+                    push  si
+
+    ; bx = SourceIndex
+    ; cx = Count / Len / CharsToMove
+    ; dx = Index
+
+                    mov   bx, dx                         ; Assign string index to bx
+                    add   bx, cx                         ; Source index <- index + count
+                    call  StrLength                      ; cx <- length(s)
+                    cmp   cx, bx                         ; Is length > index?
+                    ja    @@11                           ; If yes, jump to delete chars
+                    add   di, dx                         ;  else, calculate index to string end
+                    mov   byte ptr [di], ASCNull         ; and insert null
+                    jmp   short @@99                     ; Jump to exit
+@@11:
+                    mov   si, di                         ; Make source = destination
+                    sub   cx, bx                         ; CharsToMove <- Len - SourceIndex
+                    inc   cx                             ; Plus one for null at end of string
+                    call  MoveLeft                       ; Move chars over deleted portion
+@@99:
+                    pop   si                             ; Restore registers
+                    pop   di
+                    pop   cx
+                    pop   bx
+                    ret                                  ; Return to caller
+StrDelete endp
+
+    ;---------------------------------------------------------------
     ; StrPush       Push a character onto the end of a string
     ;---------------------------------------------------------------
     ; Input:
