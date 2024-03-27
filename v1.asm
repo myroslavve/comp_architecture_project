@@ -460,4 +460,26 @@ PrintResult proc
                     ret
 PrintResult endp
 
+    ;---------------------------------------------------------------
+    ; Separators    Private routine to check for blanks, tabs, and crs
+    ;---------------------------------------------------------------
+    ; Input:
+    ;       es:si addresses character to check
+    ; Output:
+    ;       zf = 1 (je)  = character is a blank, tab, or cr
+    ;       zf = 0 (jne) = character is not a separator
+    ; Registers:
+    ;       al
+    ;---------------------------------------------------------------
+Separators proc
+                    mov   al, es:[si]                    ; Get character at es:si
+                    cmp   al, 020h                       ; Is char a blank?
+                    je    @@10                           ; Jump if yes
+                    cmp   al, 009h                       ; Is char a tab?
+                    je    @@10                           ; Jump if yes
+                    cmp   al, 00Dh                       ; Is char a cr?
+@@10:
+                    ret                                  ; Return to caller
+Separators endp
+
 end main
