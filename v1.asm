@@ -141,9 +141,13 @@ ReadArgument proc
                     loop  write_char
     write_end:      
     ; calculate length of substring
+                    push  es
+                    mov   bx, @data
+                    mov   es, bx                         ; set es to data segment, for scasb to work
                     mov   si, offset subString
                     call  StrLength
                     mov   subStringLen, cl
+                    pop   es
                           
                     ret                                  ; Return to caller
 
@@ -617,7 +621,5 @@ Separators proc
     found_separator:
                     ret                                  ; Return to caller
 Separators endp
-
-
 
 end main
