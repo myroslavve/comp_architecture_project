@@ -513,8 +513,11 @@ PrintResult proc
                     mov   si, offset line_indices        ; Set si to the address of line_indices
                     
     print_loop:     
-    ; Print count of substring
+    ; Skip if count is zero
                     mov   al, [di]
+                    cmp   al, 0
+                    jz    next_line
+    ; Print count of substring
                     call  PrintDecimal
     ; Print space
                     mov   dl, 20h
@@ -532,7 +535,7 @@ PrintResult proc
                     mov   ah, 02h
                     int   21h
                     xor   ax, ax                         ; Clear ax
-
+    next_line:      
                     inc   di                             ; Increment di
                     inc   si                             ; Increment si
                     loop  print_loop                     ; Loop until cx becomes zero
